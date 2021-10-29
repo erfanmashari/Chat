@@ -3,7 +3,7 @@ import { RiSendPlaneFill } from "react-icons/ri"
 import ChatHeader from "./ChatHeader"
 import Messages from "./Messages"
 
-const Chat = ({ textArray, setTextArray, chats, chatNum, setChatNum, profileName, setProfileName, messagesSide, setMessagesSide }) => {
+const Chat = ({ chats, setChats, chatNum, setChatNum, profileName, setProfileName, messagesSide, setMessagesSide, setIsRemoved }) => {
     const [menuSide, setMenuSide] = useState(true)
 
     // get day and time
@@ -71,8 +71,9 @@ const Chat = ({ textArray, setTextArray, chats, chatNum, setChatNum, profileName
     return (<>
         {chatNum !== "" ? 
         <div id="chats" className="bg-gray col-8 p-3">
-            <ChatHeader chats={chats} chatNum={chatNum} menuSide={menuSide} setMenuSide={setMenuSide}
-            setMessagesSide={setMessagesSide} setBlock={setBlock} setChatNum={setChatNum} />
+            <ChatHeader chats={chats} chatNum={chatNum} menuSide={menuSide} 
+            setMenuSide={setMenuSide} setMessagesSide={setMessagesSide} setIsRemoved={setIsRemoved}
+            setBlock={setBlock} setChatNum={setChatNum} setChats={setChats} />
             <Messages profileName={profileName} messagesSide={messagesSide} />
             {block ? <div className="send-message col-12">
                 <input type="text" value={text} onChange={e => setText(e.target.value)} 

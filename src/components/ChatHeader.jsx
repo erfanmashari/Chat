@@ -4,7 +4,7 @@ import { useState } from "react"
 import { IoCall, IoVideocam } from "react-icons/io5"
 import { BsThreeDots, BsArrowReturnRight } from "react-icons/bs"
 
-const ChatHeader = ({ chats, chatNum, setChatNum, setMessagesSide, menuSide, setMenuSide, setBlock }) => {
+const ChatHeader = ({ chats, setChats, chatNum, setChatNum, setMessagesSide, menuSide, setMenuSide, setBlock, setIsRemoved }) => {
     const [callSide, setCallSide] = useState("")
     const [blockButton, setBlockButton] = useState(true)
 
@@ -34,6 +34,8 @@ const ChatHeader = ({ chats, chatNum, setChatNum, setMessagesSide, menuSide, set
 
     const chatName = chats[chatNum].props.name
 
+    const profileImage = JSON.parse(localStorage.getItem(`${chatName}-img`))
+    
     // show profile
     const showProfile = e => {
         setCallSide(<ContactProfile name={chatName} index={chatNum} setCallSide={setCallSide} />)
@@ -63,10 +65,11 @@ const ChatHeader = ({ chats, chatNum, setChatNum, setMessagesSide, menuSide, set
     }
 
     const removeChat = e => {
+        setMenuSide(true)
+
         localStorage.removeItem(`${chatName}-messages`)
 
         const chatsMenu = e.target.parentElement.parentElement.parentElement.parentElement.previousElementSibling.firstChild.children[2].children
-
         // remove chat
         for (const key in chatsMenu) {
             if (isNaN(key) === false) {
@@ -77,28 +80,36 @@ const ChatHeader = ({ chats, chatNum, setChatNum, setMessagesSide, menuSide, set
         }
 
         const chatNames = JSON.parse(localStorage.getItem("chats"))
-
-        let newChats = []
-        chatNames.filter(name => name !== chatName ? newChats.push(name) : "")
         
-        localStorage.setItem("chats", JSON.stringify(newChats))
+        const newChatNames = chatNames.filter((name, index) => index !== chatNum ? name : "")
+        
+        localStorage.setItem("chats", JSON.stringify(newChatNames))
+        
+        const newChats = chats.filter((name, index) => index !== chatNum ? name : "")
+        
+        setChats(newChats)
         
         setChatNum("")
+
+        // setIsRemoved(true)
     }
 
     return (
         <div className="chat-header">
-            {menuSide ? <><div className="chat-profile">
-                <h2 className={classN}>{chatName.substring(0, 1)}</h2>
+            {menuSide ? <>
+                <div className="chat-profile" onClick={e => showProfile(e)}>
+                {profileImage !== null ? <img src={profileImage[0]} alt={profileImage[1]} className="chat-image-profile" /> :
+                <h2 className={classN}>{chatName.substring(0, 1)}</h2>}
                 <div className="chat-text">
                     <h6>{chatName}</h6>
                     <p>Online</p>
                 </div>
-            </div><div className="mt-3">
-                    <IoCall onClick={() => setCallSide(<Call classN={classN} chats={chats}
+                </div>
+                <div className="mt-3">
+                    <IoCall onClick={() => setCallSide(<Call classN={classN} chats={chats} chatNum={chatNum}
                         setCallSide={setCallSide} callType="Calling..." />)}
                         className="chat-icons" />
-                    <IoVideocam onClick={() => setCallSide(<Call classN={classN} chats={chats}
+                    <IoVideocam onClick={() => setCallSide(<Call classN={classN} chats={chats} chatNum={chatNum}
                         setCallSide={setCallSide} callType="VideoCalling..." />)}
                         className="chat-icons" />
                     <BsThreeDots onClick={() => setMenuSide(false)} className="chat-icons" />
@@ -106,17 +117,15 @@ const ChatHeader = ({ chats, chatNum, setChatNum, setMessagesSide, menuSide, set
             {callSide}</> : 
             <div className="col-12 d-flex justify-content-between align-items-center">
                 <div>
-                    <button onClick={e => showProfile(e)}
-                    className="btn btn-primary text-white">{chatName} Profile</button>
                     <button onClick={e => deleteHistory(e)}
-                    className="btn btn-danger text-white mx-2">Delete History</button>
+                    className="chat-header-buttons btn mx-2">Delete History</button>
                     {blockButton ?<button onClick={e => block(e)}
-                    className="btn btn-danger text-white">Block Chat</button> : 
+                    className="chat-header-buttons btn">Block Chat</button> : 
                     <button onClick={e => {setBlockButton(true) 
                         setBlock(true)}}
                     className="btn btn-primary text-white">UnBlock Chat</button>}
                     <button onClick={e => removeChat(e)}
-                    className="btn btn-danger text-white mx-2">Remove Chat</button>
+                    className="chat-header-buttons btn mx-2">Remove Chat</button>
                     {callSide}
                 </div>
                 <BsArrowReturnRight onClick={() => setMenuSide(true)}

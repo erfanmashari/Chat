@@ -2,6 +2,7 @@ import SideBar from "./components/SideBar";
 import ChatMenu from "./components/ChatMenu";
 import ChatCard from "./components/ChatCard";
 import Login from "./components/Login";
+import Profile from "./components/Profile";
 import { useState, useEffect } from "react";
 
 function App() {
@@ -14,6 +15,8 @@ function App() {
       <h2>Choose A Chat</h2>
     </div>
   )
+
+  const [addGroupSide, setAddGroupSide] = useState("")
 
   // chat name
   const [chatName, setChatName] = useState()
@@ -37,16 +40,17 @@ function App() {
 
   // a trick for chat menu
   const [isAdd, setIsAdd] = useState(false)
+  const [isRemoved, setIsRemoved] = useState(false)
 
   // reload chat menu
-  const [options, setOptions] = useState(<ChatMenu 
+  const [options, setOptions] = useState(<ChatMenu setIsRemoved={setIsRemoved}
     chats={chats} setChats={setChats} setChatTexts={setChatTexts} setIsAdd={setIsAdd}
     setChatName={setChatName} localChats={localChats} />)
 
   if (isAdd) {
-    setOptions(<ChatMenu chats={chats} 
+    setOptions(<ChatMenu chats={chats} setIsRemoved={setIsRemoved}
       setChats={setChats} setChatTexts={setChatTexts} setIsAdd={setIsAdd} 
-      setChatName={setChatName} localChats={localChats} />)
+      setChatName={setChatName} localChats={localChats}  addGroupSide={addGroupSide} setAddGroupSide={setAddGroupSide} />)
       
     // get local storage data
     let localData = localStorage.getItem("chats")
@@ -65,6 +69,16 @@ function App() {
 
     setIsAdd(false)
   }
+
+  if(isRemoved) {
+    const names = chats.map(chat => chat.props.name)
+    
+    localStorage.setItem("chats", JSON.stringify(names))
+
+    setOptions(<Profile username={username} phone={phone} country={country} />)
+    setIsRemoved(false)
+  }
+
   // set localstorage after rendering
   useEffect(() => {
       localStorage.setItem("chats", JSON.stringify(localChats))
@@ -73,10 +87,10 @@ function App() {
   return (
     <div className="row mt-5">
       {login ? <>
-          <SideBar setOptions={setOptions} 
+          <SideBar setOptions={setOptions}  addGroupSide={addGroupSide} setAddGroupSide={setAddGroupSide}
           chats={chats} setChats={setChats} setChatTexts={setChatTexts} setIsAdd={setIsAdd}
           setChatName={setChatName} username={username} phone={phone} country={country} />
-          {options }
+          {options}
           {chatTexts}
         </>   : <><Login setLogin={setLogin} username={username} setUsername={setUsername}
         phone={phone} setPhone={setPhone} country={country} setCountry={setCountry} /> </>

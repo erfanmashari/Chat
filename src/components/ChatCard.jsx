@@ -1,5 +1,20 @@
-const ChatCard = ({ name, index }) => {
+import { MdDelete } from "react-icons/md"
+
+const ChatCard = ({ name, index, img, deleteIcon }) => {
     const c = JSON.parse(localStorage.getItem(`${name}-messages`))
+    
+    const removeContact = e => {
+        e.target.parentElement.parentElement.parentElement.parentElement.parentElement.remove()
+
+        const contactName = e.target.parentElement.parentElement.parentElement.parentElement.firstChild.textContent
+        
+        const localData = JSON.parse(localStorage.getItem("contacts"))
+
+        let newLocal = []
+        localData.map(contact => contactName !== contact ? newLocal.push(contact) : "")
+        
+        localStorage.setItem("contacts", JSON.stringify(newLocal))
+    }
     
     let classN;
     switch (index % 6) {
@@ -24,13 +39,17 @@ const ChatCard = ({ name, index }) => {
         default:
             break;
     }
-
+    
     return (
         <div className="chat-card">
-            <h4 className={classN}>{name.substring(0, 1)}</h4>
+            {img !== "" ? <img src={img[0]} alt={img[1]} className="chat-image" /> : 
+            <h4 className={classN}>{name.substring(0, 1)}</h4>}
             <div className="card-text">
-                <h5>{name}</h5>
-                <p>{c !== null ? c[0] : ""}</p>
+                <div className="chat-card-header d-flex justify-content-between">
+                    <h5>{name}</h5>
+                    {deleteIcon ? <MdDelete onClick={e => removeContact(e)} className="delete-icon fs-3" /> : ""}
+                </div>
+                <p>{deleteIcon ? "" : c !== null ? c[0] : ""}</p>
             </div>
         </div>
     )
