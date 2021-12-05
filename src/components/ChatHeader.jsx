@@ -1,15 +1,18 @@
 import Call from "./Call"
 import ContactProfile from "./ContactProfile"
-import { useState } from "react"
+import { useState, useContext } from "react"
+import { AppContext } from "../App.js";
 import { IoCall, IoVideocam } from "react-icons/io5"
 import { BsThreeDots, BsArrowReturnRight } from "react-icons/bs"
 
-const ChatHeader = ({ chats, setChats, chatNum, setChatNum, setMessagesSide, menuSide, setMenuSide, setBlock, setIsRemoved }) => {
+const ChatHeader = ({ menuSide, setMenuSide, setBlock }) => {
+    const appContext = useContext(AppContext)
+
     const [callSide, setCallSide] = useState("")
     const [blockButton, setBlockButton] = useState(true)
 
     let classN;
-    switch (chatNum % 6) {
+    switch (appContext.chatNum[0] % 6) {
         case 0:
             classN = "chat-profile-img text-white bg-primary"
             break;
@@ -32,20 +35,20 @@ const ChatHeader = ({ chats, setChats, chatNum, setChatNum, setMessagesSide, men
             break;
     }
 
-    const chatName = chats[chatNum].props.name
+    const chatName = appContext.chats[0][appContext.chatNum[0]].props.name
 
     const profileImage = JSON.parse(localStorage.getItem(`${chatName}-img`))
     
     // show profile
     const showProfile = e => {
-        setCallSide(<ContactProfile name={chatName} index={chatNum} setCallSide={setCallSide} />)
+        setCallSide(<ContactProfile name={chatName} index={appContext.chatNum[0]} setCallSide={setCallSide} />)
     }
 
     // delete history
     const deleteHistory = e => {
         localStorage.removeItem(`${chatName}-messages`)
 
-        setMessagesSide(false)
+        appContext.messagesSide[1](false)
         
         const chatsMenu = e.target.parentElement.parentElement.parentElement.parentElement.previousElementSibling.firstChild.children[2].children
 
@@ -81,15 +84,15 @@ const ChatHeader = ({ chats, setChats, chatNum, setChatNum, setMessagesSide, men
 
         const chatNames = JSON.parse(localStorage.getItem("chats"))
         
-        const newChatNames = chatNames.filter((name, index) => index !== chatNum ? name : "")
+        const newChatNames = chatNames.filter((name, index) => index !== appContext.chatNum[0] ? name : "")
         
         localStorage.setItem("chats", JSON.stringify(newChatNames))
         
-        const newChats = chats.filter((name, index) => index !== chatNum ? name : "")
+        const newChats = appContext.chats[0].filter((name, index) => index !== appContext.chatNum[0] ? name : "")
         
-        setChats(newChats)
+        appContext.chats[1](newChats)
         
-        setChatNum("")
+        appContext.chatNum[1]("")
 
         // setIsRemoved(true)
     }
@@ -106,10 +109,10 @@ const ChatHeader = ({ chats, setChats, chatNum, setChatNum, setMessagesSide, men
                 </div>
                 </div>
                 <div className="mt-3">
-                    <IoCall onClick={() => setCallSide(<Call classN={classN} chats={chats} chatNum={chatNum}
+                    <IoCall onClick={() => setCallSide(<Call classN={classN}
                         setCallSide={setCallSide} callType="Calling..." />)}
                         className="chat-icons" />
-                    <IoVideocam onClick={() => setCallSide(<Call classN={classN} chats={chats} chatNum={chatNum}
+                    <IoVideocam onClick={() => setCallSide(<Call classN={classN}
                         setCallSide={setCallSide} callType="VideoCalling..." />)}
                         className="chat-icons" />
                     <BsThreeDots onClick={() => setMenuSide(false)} className="chat-icons" />

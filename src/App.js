@@ -3,7 +3,9 @@ import ChatMenu from "./components/ChatMenu";
 import ChatCard from "./components/ChatCard";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+
+export const AppContext = React.createContext()
 
 function App() {
   // login state
@@ -43,14 +45,10 @@ function App() {
   const [isRemoved, setIsRemoved] = useState(false)
 
   // reload chat menu
-  const [options, setOptions] = useState(<ChatMenu setIsRemoved={setIsRemoved}
-    chats={chats} setChats={setChats} setChatTexts={setChatTexts} setIsAdd={setIsAdd}
-    setChatName={setChatName} localChats={localChats} />)
+  const [options, setOptions] = useState(<ChatMenu />)
 
   if (isAdd) {
-    setOptions(<ChatMenu chats={chats} setIsRemoved={setIsRemoved}
-      setChats={setChats} setChatTexts={setChatTexts} setIsAdd={setIsAdd} 
-      setChatName={setChatName} localChats={localChats}  addGroupSide={addGroupSide} setAddGroupSide={setAddGroupSide} />)
+    setOptions(<ChatMenu />)
       
     // get local storage data
     let localData = localStorage.getItem("chats")
@@ -79,23 +77,30 @@ function App() {
     setIsRemoved(false)
   }
 
+  // some of ChatMenu states
+  const [profileName, setProfileName] = useState("")
+  const [chatNum, setChatNum] = useState("")
+  const [messagesSide, setMessagesSide] = useState(false)
+
   // set localstorage after rendering
   useEffect(() => {
       localStorage.setItem("chats", JSON.stringify(localChats))
     }, [chatName, localChats])
     
   return (
-    <div className="row mt-5">
-      {login ? <>
-          <SideBar setOptions={setOptions}  addGroupSide={addGroupSide} setAddGroupSide={setAddGroupSide}
-          chats={chats} setChats={setChats} setChatTexts={setChatTexts} setIsAdd={setIsAdd}
-          setChatName={setChatName} username={username} phone={phone} country={country} />
-          {options}
-          {chatTexts}
-        </>   : <><Login setLogin={setLogin} username={username} setUsername={setUsername}
-        phone={phone} setPhone={setPhone} country={country} setCountry={setCountry} /> </>
-      }
-    </div>
+    <AppContext.Provider value={{ isRemoved: [isRemoved, setIsRemoved], options: [options, setOptions], addGroupSide: [addGroupSide, setAddGroupSide], 
+    chats: [chats, setChats], chatTexts: [chatTexts, setChatTexts], isAdd: [isAdd, setIsAdd], chatName: [chatName, setChatName], 
+    login: [login, setLogin], username: [username, setUsername], phone: [phone, setPhone], country: [country, setCountry],
+    profileName: [profileName, setProfileName], chatNum: [chatNum, setChatNum], messagesSide: [messagesSide, setMessagesSide] }} >
+      <div className="row mt-5">
+        {login ? <>
+            <SideBar />
+            {options}
+            {chatTexts}
+          </>   : <><Login /></>
+        }
+      </div>
+    </AppContext.Provider>
   );
 }
 

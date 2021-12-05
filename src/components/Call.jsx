@@ -1,5 +1,10 @@
-const Call = ({ callType, chats, setCallSide, classN, chatNum }) => {
-    const chatName = chats[chatNum].props.name
+import { useContext } from "react"
+import { AppContext } from "../App"
+
+const Call = ({ callType, setCallSide, classN }) => {
+    const appContext = useContext(AppContext)
+
+    const chatName = appContext.chats[0][appContext.chatNum[0]].props.name
 
     const profileImage = JSON.parse(localStorage.getItem(`${chatName}-img`))
 

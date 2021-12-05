@@ -1,9 +1,12 @@
+import { useState, useEffect, useContext } from "react"
+import { AppContext } from "../App"
 import ChatCard from "./ChatCard"
 import AddContact from "./AddContact"
-import { useState, useEffect } from "react"
 import { MdPersonAddAlt1 } from "react-icons/md"
 
-const Contacts = ({ setChatTexts, setIsAdd, chats, setChats, setAddGroupSide }) => {
+const Contacts = () => {
+    const appContext = useContext(AppContext)
+
     // get contacts from localstorage
     const data = localStorage.getItem("contacts")
     const [localContacts, setLocalContacts] = useState(
@@ -22,9 +25,9 @@ const Contacts = ({ setChatTexts, setIsAdd, chats, setChats, setAddGroupSide }) 
         
         if(!chatsLocal.includes(name)) {
             if(e.target.parentElement.classList.contains("delete-icon") === false) {
-                setAddGroupSide("")  
-                setChats([...chats, <ChatCard name={name} index={chats.length} />])
-                setIsAdd(true)
+                appContext.addGroupSide[1]("")  
+                appContext.chats[1]([...appContext.chats[0], <ChatCard name={name} index={appContext.chats[0].length} />])
+                appContext.isAdd[1](true)
             }
         }
     }

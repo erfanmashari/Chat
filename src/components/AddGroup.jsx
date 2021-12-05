@@ -1,8 +1,11 @@
+import { useState, useContext } from "react"
+import { AppContext } from "../App"
 import ChatCard from "./ChatCard"
-import { useState } from "react"
 import { MdOutlineAddAPhoto } from "react-icons/md"
 
-const AddGroup = ({ setAddGroupSide, chats, setChats, setIsAdd, setChatTexts }) => {
+const AddGroup = () => {
+    const appContext = useContext(AppContext)
+
     const [profileImg, setProfileImg] = useState(<MdOutlineAddAPhoto />)
     const [imgSource, setImgSource] = useState("")
     const [imgAlt, setImgAlt] = useState("")
@@ -28,11 +31,11 @@ const AddGroup = ({ setAddGroupSide, chats, setChats, setIsAdd, setChatTexts }) 
                     localStorage.setItem(`${groupName}-img`, JSON.stringify([imgSource, imgAlt]))
                 }
                 
-                setAddGroupSide("")  
-                setChats([...chats, <ChatCard name={groupName} index={chats.length} />])
-                setIsAdd(true) 
+                appContext.addGroupSide[1]("")  
+                appContext.chats[1]([...appContext.chats[0], <ChatCard name={groupName} index={appContext.chats[0].length} />])
+                appContext.isAdd[1](true) 
             } else {
-                setAddGroupSide("")  
+                appContext.addGroupSide[1]("")  
                 alert("This Group/Contact already exist!")
             }
         } else {
@@ -50,7 +53,7 @@ const AddGroup = ({ setAddGroupSide, chats, setChats, setIsAdd, setChatTexts }) 
                     id="group-image-input" style={{display: "none"}} accept="image/png, image/jpeg" />
                 </div>
                 <div>
-                    <button onClick={() => setAddGroupSide("")}
+                    <button onClick={() => appContext.addGroupSide[1]("")}
                     className="close-group-btn btn btn-danger text-white">X</button>
                 </div>
             </div>

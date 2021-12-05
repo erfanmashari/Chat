@@ -1,21 +1,20 @@
-import Chat from "./Chat"
-import ChatCard from "./ChatCard"
-import Header from "./Header"
-import { useState, useEffect } from "react"
+import Chat from "./Chat";
+import ChatCard from "./ChatCard";
+import Header from "./Header";
+import React, { useState, useEffect, useContext } from "react";
+import { AppContext } from "../App.js";
 
-const ChatMenu = ({ chats, setChats, setIsAdd, setChatTexts, setChatName, setIsRemoved, addGroupSide, setAddGroupSide }) => {
-    let [search, setSearch] = useState([])
-    let [searchResult, setSearchResult] = useState("")
-    let [profileName, setProfileName] = useState("")
-    let [chatNum, setChatNum] = useState("")
-    const [messagesSide, setMessagesSide] = useState(false)
+const ChatMenu = () => {
+    const [search, setSearch] = useState([])
+    const [searchResult, setSearchResult] = useState("")
     const [showSearch, setShowSearch] = useState(false)
 
     const searchInput = e => {
         setSearch(e.target.value)
     }
 
-
+    const appContext = useContext(AppContext)
+    // console.log(appContext)
     
     const chatChoose = (chatNumber, chatName) => {
         // const chatsArray = JSON.parse(localStorage.getItem("chats"))
@@ -26,17 +25,16 @@ const ChatMenu = ({ chats, setChats, setIsAdd, setChatTexts, setChatName, setIsR
         // ))
         
         // setChats(newChats)
-
-        setProfileName(chatName.props.name)
-        setChatNum(chatNumber)
+        appContext.profileName[1](chatName.props.name)
+        appContext.chatNum[1](chatNumber)
         // setChatName(chatName.props.name)
         
         // get local data and check it
         const localData = localStorage.getItem(`${chatName.props.name}-messages`)
         if (localData === null) {
-            setMessagesSide(false)
+            appContext.messagesSide[1](false)
         } else {
-            setMessagesSide(true)
+            appContext.messagesSide[1](true)
         }
 
         // const newChatsLocal = newChats.map(chat => chat.props.name)
@@ -44,27 +42,24 @@ const ChatMenu = ({ chats, setChats, setIsAdd, setChatTexts, setChatName, setIsR
         // localStorage.setItem("chats", JSON.stringify(newChatsLocal))
     }
 
-    const searchChoose = (chatNumber, chatName) => {
-        setProfileName(chatName)
-        setChatNum(chatNumber)
-        setChatName(chatName)
+    const searchChoose = (chatNumber, chatNameValue) => {
+        appContext.profileName[1](chatNameValue)
+        appContext.chatNum[1](chatNumber)
+        appContext.chatName[1](chatNameValue)
 
         // get local data and check it
-        const localData = localStorage.getItem(`${chatName}-messages`)
+        const localData = localStorage.getItem(`${chatNameValue}-messages`)
         if (localData === null) {
-            setMessagesSide(false)
+            appContext.messagesSide[1](false)
         } else {
-            setMessagesSide(true)
+            appContext.messagesSide[1](true)
         }
     }
     
     useEffect(() => {
-        setChatTexts(<Chat chatNum={chatNum} setChatNum={setChatNum} setIsRemoved={setIsRemoved}
-            chats={chats} setChats={setChats} profileName={profileName} 
-            setProfileName={setProfileName} messagesSide={messagesSide} setMessagesSide={setMessagesSide} />)
-
+        appContext.chatTexts[1](<Chat />)
         if (search.length > 0) {
-            chats.map(chat => {
+            appContext.chats[0].map(chat => {
                 if(chat.props.name.includes(search)) { 
                     setSearchResult([...searchResult, chat.props.name]) 
                     setShowSearch(true)
@@ -75,20 +70,20 @@ const ChatMenu = ({ chats, setChats, setIsAdd, setChatTexts, setChatName, setIsR
         } else {
             setShowSearch(false)
         }
-    }, [chatNum, chats, messagesSide, profileName, search, searchResult, setChatTexts, setChats, setIsRemoved])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search, searchResult])
     
     return (
         <div id="chat-menu" className="chat-div col-3 vstack">
             <div className="chat-menu col-12 vstack bg-white rounded-3">
-                <Header chats={chats} setChats={setChats} setIsAdd={setIsAdd}
-                addGroupSide={addGroupSide} setAddGroupSide={setAddGroupSide}  />
+                <Header />
                 <div className="px-3 py-2">
                     <input value={search} onChange={e => searchInput(e)}
                     type="text" placeholder="Search Chat" className="input bg-gray col-12 p-2"/>
                 </div>
                 <div id="chats-menu-div">
                     {showSearch ? searchResult.map((chat, index) => <div className={chat} key={index} onClick={e => searchChoose(index, chat)}><div>search</div></div>) : 
-                    chats.map((chat, index) => <div className={chat.props.name} key={index} onClick={e => chatChoose(index, chat)}>
+                    appContext.chats[0].map((chat, index) => <div className={chat.props.name} key={index} onClick={e => chatChoose(index, chat)}>
                         <ChatCard name={chat.props.name} index={index}
                         img={localStorage.getItem(`${chat.props.name}-img`) !== null ? JSON.parse(localStorage.getItem(`${chat.props.name}-img`)) : ""} />
                         </div>)}

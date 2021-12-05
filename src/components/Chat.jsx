@@ -1,9 +1,12 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
+import { AppContext } from "../App"
 import { RiSendPlaneFill } from "react-icons/ri"
 import ChatHeader from "./ChatHeader"
 import Messages from "./Messages"
 
-const Chat = ({ chats, setChats, chatNum, setChatNum, profileName, setProfileName, messagesSide, setMessagesSide, setIsRemoved }) => {
+const Chat = () => {
+    const appContext = useContext(AppContext)
+
     const [menuSide, setMenuSide] = useState(true)
 
     // get day and time
@@ -19,7 +22,7 @@ const Chat = ({ chats, setChats, chatNum, setChatNum, profileName, setProfileNam
     // get and show Message and save it to localStorage
     const getMessage = (e) => {
         if(text !== "") {
-            setMessagesSide(true)
+            appContext.messagesSide[1](true)
             
             setText("")
             
@@ -45,7 +48,7 @@ const Chat = ({ chats, setChats, chatNum, setChatNum, profileName, setProfileNam
                 headerButtons.filter((e, index) => index !== nameLength -1 ? chatName = e : "")
             }
             
-            setProfileName(chatName)
+            appContext.profileName[1](chatName)
 
             let localData = localStorage.getItem(`${chatName}-messages`)
             if(localData === null) { 
@@ -67,14 +70,12 @@ const Chat = ({ chats, setChats, chatNum, setChatNum, profileName, setProfileNam
             }
         }
     }
-        
+    
     return (<>
-        {chatNum !== "" ? 
+        {appContext.chatNum[0] !== "" ? 
         <div id="chats" className="bg-gray col-8 p-3">
-            <ChatHeader chats={chats} chatNum={chatNum} menuSide={menuSide} 
-            setMenuSide={setMenuSide} setMessagesSide={setMessagesSide} setIsRemoved={setIsRemoved}
-            setBlock={setBlock} setChatNum={setChatNum} setChats={setChats} />
-            <Messages profileName={profileName} messagesSide={messagesSide} />
+            <ChatHeader setBlock={setBlock} menuSide={menuSide} setMenuSide={setMenuSide} />
+            <Messages />
             {block ? <div className="send-message col-12">
                 <input type="text" value={text} onChange={e => setText(e.target.value)} 
                 placeholder="Type Your Message..." className="input col-9 p-1" />
